@@ -21,6 +21,23 @@ Meanwhile, fans can finally support their favorite creators in a direct and tran
 
 [Fandomchain api](https://rpc.fandomchain.com)
 
+## System Requirements
+
+```json
+    "sdk": {
+      "type": "cosmos",
+      "version": "v0.53.3"
+    },
+    "consensus": {
+      "type": "cometbft",
+      "version": "v0.38.17"
+    },
+    "ibc": {
+      "type": "go",
+      "version": "v10.2.0"
+    },
+```
+
 ## Installation
 
 Download [ignite](https://ignite.com/) client
