@@ -1,0 +1,24 @@
+version: 1
+validation: sovereign
+default_denom: fandomChain
+accounts: 
+- name: admin1
+  coins:
+  - 20000000000000000ufandomChain
+- name: admin2
+  coins:
+  - 20000000000000000ufandomChain
+client:
+  openapi:
+    path: docs/static/openapi.json
+faucet:
+  name: admin2
+  coins:
+  - 100000000000000ufandomChain
+validators:
+- name: admin1
+  bonded: 10000000000000000ufandomChain
+- name: validator1
+  bonded: 200000000000000000ufandomChain
+- name: validator2
+  bonded: 100000000000000000ufandomChain

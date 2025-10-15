@@ -1,0 +1,15 @@
+syntax = "proto3";
+package fandomchain.tokenfactory.v1;
+
+option go_package = "fandomChain/x/tokenfactory/types";
+
+// TokenfactoryPacketData defines the Tokenfactory data packet.
+message TokenfactoryPacketData {
+  oneof packet {
+    NoData noData = 1;
+  }
+}
+
+// NoData defines an empty data packet.
+message NoData {}
+

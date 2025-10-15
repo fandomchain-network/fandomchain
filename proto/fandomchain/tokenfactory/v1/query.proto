@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package fandomchain.tokenfactory.v1;
+
+import "amino/amino.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "fandomchain/tokenfactory/v1/denom.proto";
+import "fandomchain/tokenfactory/v1/params.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+
+option go_package = "fandomChain/x/tokenfactory/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/fandomChain/tokenfactory/v1/params";
+  }
+
+  // ListDenom Queries a list of Denom items.
+  rpc GetDenom(QueryGetDenomRequest) returns (QueryGetDenomResponse) {
+    option (google.api.http).get = "/fandomChain/tokenfactory/v1/denom/{denom}";
+  }
+
+  // ListDenom defines the ListDenom RPC.
+  rpc ListDenom(QueryAllDenomRequest) returns (QueryAllDenomResponse) {
+    option (google.api.http).get = "/fandomChain/tokenfactory/v1/denom";
+  }
+
+  // GetBondingCurvePrice queries the current price of a denom in the bonding curve
+  rpc GetBondingCurvePrice(QueryGetBondingCurvePriceRequest) returns (QueryGetBondingCurvePriceResponse) {
+    option (google.api.http).get = "/fandomChain/tokenfactory/v1/bonding_curve_price/{denom}";
+  }
+
+  // GetBondingCurveProgress queries the progress of a bonding curve
+  rpc GetBondingCurveProgress(QueryGetBondingCurveProgressRequest) returns (QueryGetBondingCurveProgressResponse) {
+    option (google.api.http).get = "/fandomChain/tokenfactory/v1/bonding_curve_progress/{denom}";
+  }
+
+  // EstimateBuy estimates how many tokens would be received for a given fandom amount
+  rpc EstimateBuy(QueryEstimateBuyRequest) returns (QueryEstimateBuyResponse) {
+    option (google.api.http).get = "/fandomChain/tokenfactory/v1/estimate_buy/{denom}/{fandom_amount}";
+  }
+
+  // EstimateSell estimates how many fandom tokens would be received for selling tokens
+  rpc EstimateSell(QueryEstimateSellRequest) returns (QueryEstimateSellResponse) {
+    option (google.api.http).get = "/fandomChain/tokenfactory/v1/estimate_sell/{denom}/{token_amount}";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// QueryGetDenomRequest defines the QueryGetDenomRequest message.
+message QueryGetDenomRequest {
+  string denom = 1;
+}
+
+// QueryGetDenomResponse defines the QueryGetDenomResponse message.
+message QueryGetDenomResponse {
+  Denom denom = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllDenomRequest defines the QueryAllDenomRequest message.
+message QueryAllDenomRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllDenomResponse defines the QueryAllDenomResponse message.
+message QueryAllDenomResponse {
+  repeated Denom denom = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryGetBondingCurvePriceRequest defines the request for getting bonding curve price
+message QueryGetBondingCurvePriceRequest {
+  string denom = 1;
+}
+
+// QueryGetBondingCurvePriceResponse defines the response for bonding curve price
+message QueryGetBondingCurvePriceResponse {
+  string price = 1; // Price as a decimal string
+}
+
+// QueryGetBondingCurveProgressRequest defines the request for bonding curve progress
+message QueryGetBondingCurveProgressRequest {
+  string denom = 1;
+}
+
+// QueryGetBondingCurveProgressResponse defines the response for bonding curve progress
+message QueryGetBondingCurveProgressResponse {
+  string progress = 1; // Progress as a percentage (0-100)
+  int64 tokens_sold = 2;
+  int64 tokens_remaining = 3;
+}
+
+// QueryEstimateBuyRequest defines the request for estimating a buy
+message QueryEstimateBuyRequest {
+  string denom = 1;
+  int64 fandom_amount = 2;
+}
+
+// QueryEstimateBuyResponse defines the response for estimating a buy
+message QueryEstimateBuyResponse {
+  int64 tokens_out = 1;
+  string price_impact = 2; // Price impact as percentage
+}
+
+// QueryEstimateSellRequest defines the request for estimating a sell
+message QueryEstimateSellRequest {
+  string denom = 1;
+  int64 token_amount = 2;
+}
+
+// QueryEstimateSellResponse defines the response for estimating a sell
+message QueryEstimateSellResponse {
+  int64 fandom_out = 1;
+  string price_impact = 2; // Price impact as percentage
+}

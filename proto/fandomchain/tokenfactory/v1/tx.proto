@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package fandomchain.tokenfactory.v1;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "fandomchain/tokenfactory/v1/params.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "fandomChain/x/tokenfactory/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+
+  // CreateDenom defines the CreateDenom RPC.
+  rpc CreateDenom(MsgCreateDenom) returns (MsgCreateDenomResponse);
+
+  // BuyWithBondingCurve defines the BuyWithBondingCurve RPC.
+  rpc BuyWithBondingCurve(MsgBuyWithBondingCurve) returns (MsgBuyWithBondingCurveResponse);
+
+  // SellWithBondingCurve defines the SellWithBondingCurve RPC.
+  rpc SellWithBondingCurve(MsgSellWithBondingCurve) returns (MsgSellWithBondingCurveResponse);
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "fandomchain/x/tokenfactory/MsgUpdateParams";
+
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
+
+// MsgCreateDenom defines the MsgCreateDenom message.
+message MsgCreateDenom {
+  option (cosmos.msg.v1.signer) = "owner";
+  string owner = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string denom = 2;
+  string description = 3;
+  string ticker = 4;
+  string url = 5;
+}
+
+// MsgCreateDenomResponse defines the MsgCreateDenomResponse message.
+message MsgCreateDenomResponse {}
+
+// MsgBuyWithBondingCurve defines the MsgBuyWithBondingCurve message.
+message MsgBuyWithBondingCurve {
+  option (cosmos.msg.v1.signer) = "buyer";
+  string buyer = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string denom = 2;
+  int64 fandomAmount = 3; // Amount of FandomChain tokens to spend
+  int64 minTokensOut = 4; // Minimum tokens expected (slippage protection)
+}
+
+// MsgBuyWithBondingCurveResponse defines the response.
+message MsgBuyWithBondingCurveResponse {
+  int64 tokensReceived = 1;
+}
+
+// MsgSellWithBondingCurve defines the MsgSellWithBondingCurve message.
+message MsgSellWithBondingCurve {
+  option (cosmos.msg.v1.signer) = "seller";
+  string seller = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string denom = 2;
+  int64 tokenAmount = 3; // Amount of tokens to sell
+  int64 minFandomOut = 4; // Minimum FandomChain tokens expected (slippage protection)
+}
+
+// MsgSellWithBondingCurveResponse defines the response.
+message MsgSellWithBondingCurveResponse {
+  int64 fandomReceived = 1;
+}

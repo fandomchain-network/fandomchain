@@ -1,0 +1,24 @@
+syntax = "proto3";
+package fandomchain.tokenfactory.v1;
+
+option go_package = "fandomChain/x/tokenfactory/types";
+
+// Denom defines the Denom message.
+message Denom {
+  string denom = 1;
+  string description = 2;
+  string ticker = 3;
+  int64 precision = 4;
+  string url = 5;
+  string owner = 6;
+
+  // Bonding Curve fields
+  int64 virtual_token_reserves = 7;
+  int64 virtual_fandom_reserves = 8;
+  int64 real_token_reserves = 9;
+  int64 real_fandom_reserves = 10;
+  int64 initial_virtual_token_reserves = 11;
+  int64 initial_virtual_fandom_reserves = 12;
+  int64 initial_real_token_reserves = 13;
+  bool bonding_curve_enabled = 14;
+}

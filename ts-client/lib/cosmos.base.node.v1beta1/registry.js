@@ -1,0 +1,2 @@
+const msgTypes = [];
+export { msgTypes };

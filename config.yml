@@ -1,0 +1,32 @@
+validation: sovereign
+version: 1
+build:
+    main: cmd/fandomChaind
+    proto:
+        path: ""
+accounts:
+    - name: admin1
+      coins:
+        - 20000000000000000ufandomChain
+    - name: admin2
+      coins:
+        - 20000000000000000ufandomChain
+faucet:
+    name: admin2
+    coins:
+        - 100000000000000ufandomChain
+client:
+    typescript:
+        path: ts-client
+    composables:
+        path: vue/src/composables
+    openapi:
+        path: docs/static/openapi.json
+default_denom: ufandomChain
+validators:
+    - name: admin1
+      bonded: 10000000000000000ufandomChain
+    - name: validator1
+      bonded: 200000000000000000ufandomChain
+    - name: validator2
+      bonded: 100000000000000000ufandomChain
