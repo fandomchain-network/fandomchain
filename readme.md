@@ -19,7 +19,16 @@ Meanwhile, fans can finally support their favorite creators in a direct and tran
 
 [Fandomchain rpc](https://rpc.fandomchain.com)
 
-[Fandomchain api](https://rpc.fandomchain.com)
+[Fandomchain api](https://api.fandomchain.com)
+
+Peers
+```json
+  {
+    "id": "9d8481536e7bdd63c854f60dff1887c742f5f9b5",
+    "address": "51.91.102.167",
+    "provider": "FandomChain"
+  }
+```
 
 ## System Requirements
 
