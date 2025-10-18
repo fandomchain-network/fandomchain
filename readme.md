@@ -24,7 +24,7 @@ Meanwhile, fans can finally support their favorite creators in a direct and tran
 Peers
 ```json
   {
-    "id": "9d8481536e7bdd63c854f60dff1887c742f5f9b5",
+    "id": "1fcb80b277e98b2399053177741b3ce648756f25",
     "address": "51.91.102.167",
     "provider": "FandomChain"
   }
@@ -51,22 +51,22 @@ ibc info
 ```json
   "chain_1": {
     "chain_name": "osmosis-1",
-    "client_id": "07-tendermint-3606",
-    "connection_id": "connection-10956"
+    "client_id": "07-tendermint-3613",
+    "connection_id": "connection-10964"
   },
   "chain_2": {
     "chain_name": "fandomChain",
     "client_id": "07-tendermint-0",
-    "connection_id": "connection-2"
+    "connection_id": "connection-0"
   },
   "channels": [
       {
         "chain_1": {
-          "channel_id": "channel-0",
+          "channel_id": "channel-107392",
           "port_id": "transfer"
         },
         "chain_2": {
-          "channel_id": "channel-107248",
+          "channel_id": "channel-0",
           "port_id": "transfer"
         },
         "ordering": "unordered",
