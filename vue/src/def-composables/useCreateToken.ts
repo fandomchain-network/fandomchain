@@ -41,6 +41,56 @@ export function useCreateToken() {
     }, 5000);
   }
 
+  // Field-level validation errors
+  const fieldErrors = ref<Record<string, string>>({});
+
+  /**
+   * Validate individual field
+   */
+  function validateField(fieldName: keyof CreateTokenForm): string | null {
+    const value = form.value[fieldName];
+
+    switch (fieldName) {
+      case 'denom':
+        if (!value || value.trim() === '') {
+          return 'Denom is required';
+        }
+        const denomRegex = /^[a-z0-9]+$/;
+        if (!denomRegex.test(value)) {
+          return 'Denom must contain only lowercase letters and numbers';
+        }
+        break;
+
+      case 'ticker':
+        if (!value || value.trim() === '') {
+          return 'Ticker is required';
+        }
+        const tickerRegex = /^[A-Z0-9]+$/;
+        if (!tickerRegex.test(value)) {
+          return 'Ticker must contain only uppercase letters and numbers';
+        }
+        break;
+
+      case 'description':
+        if (!value || value.trim() === '') {
+          return 'Description is required';
+        }
+        break;
+
+      case 'url':
+        if (value && value.trim() !== '') {
+          try {
+            new URL(value);
+          } catch {
+            return 'Invalid URL format';
+          }
+        }
+        break;
+    }
+
+    return null;
+  }
+
   /**
    * Validate form
    */
@@ -169,10 +219,12 @@ export function useCreateToken() {
     message,
     createdToken,
     address,
+    fieldErrors,
 
     // Methods
     createToken,
     resetForm,
     validateForm,
+    validateField,
   };
 }
