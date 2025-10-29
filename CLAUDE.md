@@ -293,3 +293,4 @@ These permissions are configured in `app/app_config.go`.
 - Ignite CLI: https://docs.ignite.com
 - Architecture diagram: `ARCHITECTURE.md` (detailed technical documentation)
 - When the user is asking you to change business logic, dont forget to update ARCHITECTURE.md
+- Use context7 to check up-to-date docs when needed for implementing new libraries or frameworks, or adding features using them
