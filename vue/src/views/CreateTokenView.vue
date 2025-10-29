@@ -113,11 +113,18 @@
                 v-model="form.denom"
                 type="text"
                 placeholder="e.g., streamercoin"
-                class="w-full px-4 py-3 border rounded-lg bg-gray-900 border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+                :class="[
+                  'w-full px-4 py-3 border rounded-lg bg-gray-900 focus:outline-none transition-colors',
+                  fieldErrors.denom ? 'border-red-500 focus:border-red-500' : 'border-gray-600 focus:border-blue-500'
+                ]"
                 :disabled="loading"
+                @blur="handleFieldBlur('denom')"
                 required
               />
-              <p class="mt-1 text-xs text-gray-400">
+              <p v-if="fieldErrors.denom" class="mt-1 text-xs text-red-400">
+                {{ fieldErrors.denom }}
+              </p>
+              <p v-else class="mt-1 text-xs text-gray-400">
                 Unique identifier for your token (lowercase letters and numbers only)
               </p>
             </div>
@@ -132,12 +139,19 @@
                 v-model="form.ticker"
                 type="text"
                 placeholder="e.g., STREAM"
-                class="w-full px-4 py-3 border rounded-lg bg-gray-900 border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+                :class="[
+                  'w-full px-4 py-3 border rounded-lg bg-gray-900 focus:outline-none transition-colors',
+                  fieldErrors.ticker ? 'border-red-500 focus:border-red-500' : 'border-gray-600 focus:border-blue-500'
+                ]"
                 :disabled="loading"
                 maxlength="10"
+                @blur="handleFieldBlur('ticker')"
                 required
               />
-              <p class="mt-1 text-xs text-gray-400">
+              <p v-if="fieldErrors.ticker" class="mt-1 text-xs text-red-400">
+                {{ fieldErrors.ticker }}
+              </p>
+              <p v-else class="mt-1 text-xs text-gray-400">
                 Trading symbol for your token (uppercase letters and numbers only, max 10 characters)
               </p>
             </div>
@@ -152,11 +166,18 @@
                 v-model="form.description"
                 rows="4"
                 placeholder="Describe your token and its purpose..."
-                class="w-full px-4 py-3 border rounded-lg bg-gray-900 border-gray-600 focus:border-blue-500 focus:outline-none transition-colors resize-none"
+                :class="[
+                  'w-full px-4 py-3 border rounded-lg bg-gray-900 focus:outline-none transition-colors resize-none',
+                  fieldErrors.description ? 'border-red-500 focus:border-red-500' : 'border-gray-600 focus:border-blue-500'
+                ]"
                 :disabled="loading"
+                @blur="handleFieldBlur('description')"
                 required
               ></textarea>
-              <p class="mt-1 text-xs text-gray-400">
+              <p v-if="fieldErrors.description" class="mt-1 text-xs text-red-400">
+                {{ fieldErrors.description }}
+              </p>
+              <p v-else class="mt-1 text-xs text-gray-400">
                 Tell your community what this token represents
               </p>
             </div>
@@ -171,10 +192,17 @@
                 v-model="form.url"
                 type="url"
                 placeholder="https://example.com"
-                class="w-full px-4 py-3 border rounded-lg bg-gray-900 border-gray-600 focus:border-blue-500 focus:outline-none transition-colors"
+                :class="[
+                  'w-full px-4 py-3 border rounded-lg bg-gray-900 focus:outline-none transition-colors',
+                  fieldErrors.url ? 'border-red-500 focus:border-red-500' : 'border-gray-600 focus:border-blue-500'
+                ]"
                 :disabled="loading"
+                @blur="handleFieldBlur('url')"
               />
-              <p class="mt-1 text-xs text-gray-400">
+              <p v-if="fieldErrors.url" class="mt-1 text-xs text-red-400">
+                {{ fieldErrors.url }}
+              </p>
+              <p v-else class="mt-1 text-xs text-gray-400">
                 Link to your website, stream, or social media
               </p>
             </div>
@@ -394,11 +422,25 @@ const {
   message,
   createdToken,
   address,
+  fieldErrors,
 
   // Methods
   createToken,
   resetForm,
+  validateField,
 } = useCreateToken();
+
+/**
+ * Handle field blur - validate on blur
+ */
+function handleFieldBlur(fieldName: 'denom' | 'ticker' | 'description' | 'url') {
+  const error = validateField(fieldName);
+  if (error) {
+    fieldErrors.value[fieldName] = error;
+  } else {
+    delete fieldErrors.value[fieldName];
+  }
+}
 
 /**
  * Format address for display

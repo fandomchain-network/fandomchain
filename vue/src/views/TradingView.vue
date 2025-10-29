@@ -5,8 +5,8 @@
       <div class="mb-8">
         <h1 class="text-3xl font-bold mb-4">Token Trading</h1>
         <div class="flex gap-4 items-center">
-          <select 
-            v-model="selectedDenom" 
+          <select
+            v-model="selectedDenom"
             class="px-4 py-2 border rounded-lg"
             @change="handleLoadTokenData"
           >
@@ -15,18 +15,40 @@
               {{ denom.ticker }} - {{ denom.denom }}
             </option>
           </select>
-          
-          <button 
-            @click="handleLoadTokenData" 
-            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            :disabled="!selectedDenom"
+
+          <button
+            @click="handleLoadTokenData"
+            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center"
+            :disabled="!selectedDenom || loading"
           >
-            Refresh
+            <svg
+              v-if="loading"
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            {{ loading ? 'Loading...' : 'Refresh' }}
           </button>
         </div>
       </div>
 
-      <div v-if="selectedDenom && tokenData" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <LoadingSpinner v-if="loading && !tokenData" message="Loading token data..." />
+      <div v-else-if="selectedDenom && tokenData" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left Column: Token Info & Chart -->
         <div class="lg:col-span-2 space-y-6">
           <!-- Token Information Card -->
@@ -103,12 +125,33 @@
                 />
               </div>
               
-              <button 
-                @click="executeBuy" 
-                class="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold"
+              <button
+                @click="executeBuy"
+                class="w-full px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 :disabled="!buyAmount || buyAmount <= 0 || loading"
               >
-                {{ loading ? 'Processing...' : 'Buy Tokens' }}
+                <svg
+                  v-if="loading"
+                  class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                {{ loading ? 'Processing Transaction...' : 'Buy Tokens' }}
               </button>
             </div>
           </div>
@@ -146,12 +189,33 @@
                 />
               </div>
               
-              <button 
-                @click="executeSell" 
-                class="w-full px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 font-bold"
+              <button
+                @click="executeSell"
+                class="w-full px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 font-bold flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 :disabled="!sellAmount || sellAmount <= 0 || loading"
               >
-                {{ loading ? 'Processing...' : 'Sell Tokens' }}
+                <svg
+                  v-if="loading"
+                  class="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                {{ loading ? 'Processing Transaction...' : 'Sell Tokens' }}
               </button>
             </div>
           </div>
@@ -192,6 +256,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useTradingView } from '../def-composables/useTradingView';
+import LoadingSpinner from '../components/LoadingSpinner.vue';
 
 // Use composable
 const {

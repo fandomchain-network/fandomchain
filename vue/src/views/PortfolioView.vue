@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="container mx-auto">
+    <LoadingSpinner v-if="!address" message="Connecting to wallet..." />
+    <div v-else class="container mx-auto">
       <div class="grid grid-cols-2">
         <div>
           <IgntAssets :key="address" class="px-2.5 mb-10" :display-limit="3" />
@@ -15,6 +16,7 @@
 <script setup lang="ts">
 import { useAddress } from "@/def-composables/useAddress";
 
+import LoadingSpinner from "../components/LoadingSpinner.vue";
 import IgntAssets from "../components/IgntAssets.vue";
 import IgntTransactions from "../components/IgntTransactions.vue";
 import IgntTransfer from "../components/IgntTransfer.vue";

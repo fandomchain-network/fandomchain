@@ -25,5 +25,7 @@ const items = [
 
 <template>
   <IgntHeader :nav-items="items"></IgntHeader>
-  <RouterView />
+  <main id="main-content">
+    <RouterView />
+  </main>
 </template>

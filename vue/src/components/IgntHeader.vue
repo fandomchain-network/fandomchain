@@ -1,17 +1,17 @@
 <template>
-  <header class="flex p-5">
+  <header class="flex p-5 flex-wrap gap-2">
     <IgntLogo class="mx-2.5" />
-    <nav class="flex flex-1 justify-between">
-      <ul class="flex items-center">
+    <nav class="flex flex-1 justify-between min-w-0">
+      <ul class="flex items-center flex-wrap gap-2">
         <li
-          class="text-3 px-4 font-normal"
+          class="text-3 px-2 sm:px-4 font-normal text-sm sm:text-base"
           v-for="item in navItems"
           :key="item.label"
         >
           <IgntLink :item="item"></IgntLink>
         </li>
       </ul>
-      <div><IgntAcc /></div>
+      <div class="flex-shrink-0"><IgntAcc /></div>
     </nav>
   </header>
 </template>
