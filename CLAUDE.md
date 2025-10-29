@@ -292,3 +292,4 @@ These permissions are configured in `app/app_config.go`.
 - IBC Protocol: https://ibc.cosmos.network
 - Ignite CLI: https://docs.ignite.com
 - Architecture diagram: `ARCHITECTURE.md` (detailed technical documentation)
+- When the user is asking you to change business logic, dont forget to update ARCHITECTURE.md

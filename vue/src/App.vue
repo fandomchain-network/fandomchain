@@ -9,6 +9,10 @@ const items = [
     to: "/",
   },
   {
+    label: "Create Token",
+    to: "/create-token",
+  },
+  {
     label: "Trading",
     to: "/trading",
   },
