@@ -123,11 +123,14 @@ If you absolutely must change these values:
 DO NOT PROCEED WITHOUT EXPLICIT APPROVAL!
 """
             output = {
-                "decision": "block",
-                "reason": context
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": context
+                }
             }
             print(json.dumps(output))
-            sys.exit(1)
+            sys.exit(0)
         
 except subprocess.TimeoutExpired:
     print("Warning: Git status check timed out", file=sys.stderr)
