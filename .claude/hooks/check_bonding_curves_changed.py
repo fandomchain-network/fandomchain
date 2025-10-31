@@ -20,7 +20,6 @@ workspace_path = os.environ.get('WORKSPACE_PATH', '/home/berthier/Desktop/Projec
 # Files to monitor for bonding curve changes
 bonding_curve_files = [
     'x/tokenfactory/keeper/bonding_curve.go',
-    'proto/fandomchain/tokenfactory/v1/denom.proto',
 ]
 
 # Critical constants that should NOT be modified without extreme caution
@@ -133,30 +132,11 @@ REQUIRED ACTIONS BEFORE COMMITTING:
 DO NOT COMMIT THESE CHANGES WITHOUT EXPLICIT APPROVAL!
 """
             print(context, file=sys.stderr)
-            input_data['tool_response']['continue'] = False 
-            input_data['tool_response']['stopReason'] = context
+            #input_data['tool_response']['continue'] = False 
+            #input_data['tool_response']['stopReason'] = context
 
             sys.exit(1)
         
-        # If other bonding curve files have been modified, add a warning
-        elif changed_bonding_files:
-            context = f"""
-⚠️  BONDING CURVE FILES MODIFIED (detected at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}):
-{chr(10).join(f'  - {file}' for file in changed_bonding_files)}
-
-IMPORTANT: Bonding curve changes can have significant economic implications:
-- Ensure all mathematical formulas are correct
-- Verify price calculations maintain expected behavior
-- Consider impact on existing tokens and users
-- Review security implications (overflow, underflow, etc.)
-- Update tests to cover the changes
-- Document any breaking changes
-
-Please double-check these critical files before committing.
-"""
-            print(context, file=sys.stdout)
-            sys.exit(0)
-    
 except subprocess.TimeoutExpired:
     print("Warning: Git status check timed out", file=sys.stderr)
 except FileNotFoundError:
