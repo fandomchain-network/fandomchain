@@ -17,6 +17,11 @@ except json.JSONDecodeError as e:
 # Get the workspace path - should be the repo root
 workspace_path = os.environ.get('WORKSPACE_PATH', '/home/berthier/Desktop/Projects/fandomchain-official-repo')
 
+# Check if this is a PreToolUse hook for detecting planned edits
+hook_event = input_data.get('hook_event_name', '')
+tool_name = input_data.get('tool_name', '')
+tool_input = input_data.get('tool_input', {})
+
 # Files to monitor for bonding curve changes
 bonding_curve_files = [
     'x/tokenfactory/keeper/bonding_curve.go',
@@ -70,71 +75,90 @@ def check_constants_modified(file_path):
     
     return modified_constants
 
+
+def check_pretool_edit(tool_input):
+    """Check if a PreToolUse Edit is trying to modify critical constants"""
+    modified_constants = []
+    
+    if not tool_input:
+        return modified_constants
+    
+    file_path = tool_input.get('file_path', '')
+    new_string = tool_input.get('new_string', '')
+    old_string = tool_input.get('old_string', '')
+    
+    # Only check if editing bonding_curve.go
+    if 'bonding_curve.go' not in file_path:
+        return modified_constants
+    
+    # Check if any critical constant is being modified
+    for const_name, expected_value in CRITICAL_CONSTANTS.items():
+        pattern = rf'{const_name}\s*=\s*([^\s\n]+)'
+        
+        # Check if the old string contains the constant
+        old_match = re.search(pattern, old_string)
+        new_match = re.search(pattern, new_string)
+        
+        if old_match and new_match:
+            old_value = old_match.group(1).strip()
+            new_value = new_match.group(1).strip()
+            
+            # Normalize for comparison
+            old_normalized = old_value.replace(' ', '').replace('_', '')
+            new_normalized = new_value.replace(' ', '').replace('_', '')
+            
+            if old_normalized != new_normalized:
+                modified_constants.append({
+                    'name': const_name,
+                    'expected': old_value,
+                    'actual': new_value
+                })
+    
+    return modified_constants
+
 try:
     # Change to workspace directory
     os.chdir(workspace_path)
     
-    # Check git status for modified files
-    result = subprocess.run(
-        ['git', 'status', '--porcelain'],
-        capture_output=True,
-        text=True,
-        timeout=5
-    )
+    constants_modified = []
     
-    if result.returncode == 0:
-        modified_files = result.stdout.strip().split('\n')
-        changed_bonding_files = []
-        constants_modified = []
+    # Check if this is a PreToolUse event trying to edit bonding curve constants
+    if hook_event == 'PreToolUse' and tool_name in ['Edit', 'search_replace']:
+        constants_modified = check_pretool_edit(tool_input)
         
-        for line in modified_files:
-            if line.strip():
-                # Parse git status output (format: "XY filename")
-                status = line[:2]
-                filename = line[3:].strip()
-                
-                # Check if any bonding curve file is modified
-                for monitored_file in bonding_curve_files:
-                    if monitored_file in filename:
-                        changed_bonding_files.append(filename)
-                        
-                        # If bonding_curve.go is modified, check critical constants
-                        if filename == 'x/tokenfactory/keeper/bonding_curve.go':
-                            constants_modified = check_constants_modified(filename)
-        
-        # If critical constants have been modified - CRITICAL WARNING
         if constants_modified:
             const_changes = '\n'.join(
                 f'  ❌ {c["name"]}: {c["expected"]} → {c["actual"]}'
                 for c in constants_modified
             )
             context = f"""
-🚨 CRITICAL: BONDING CURVE CONSTANTS MODIFIED! 🚨 (detected at {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+🚨 BLOCKED: Attempting to modify CRITICAL bonding curve constants! 🚨
 
 {const_changes}
 
-⛔ THESE CONSTANTS SHOULD NEVER BE MODIFIED WITHOUT APPROVAL ⛔
+⛔ THESE CONSTANTS SHOULD NEVER BE MODIFIED ⛔
 
-Changing these values will:
+This edit has been BLOCKED because changing these values will:
 - Break compatibility with existing tokens
 - Affect all active bonding curves
 - Potentially cause loss of funds
 - Create inconsistent pricing
 - Require protocol migration
 
-REQUIRED ACTIONS BEFORE COMMITTING:
-1. Revert these changes unless explicitly authorized
-2. If authorized: Update ALL tests to reflect new values
-3. Document the breaking changes in CHANGELOG
+If you absolutely must change these values:
+1. Get explicit authorization from the protocol team
+2. Update ALL tests to reflect new values
+3. Document breaking changes in CHANGELOG
 4. Notify all stakeholders
 5. Plan migration strategy for existing tokens
 
-DO NOT COMMIT THESE CHANGES WITHOUT EXPLICIT APPROVAL!
+DO NOT PROCEED WITHOUT EXPLICIT APPROVAL!
 """
-            print(context, file=sys.stderr)
-            #input_data['tool_response']['continue'] = False 
-            #input_data['tool_response']['stopReason'] = context
-
+            output = {
+                "decision": "block",
+                "reason": context
+            }
+            print(json.dumps(output))
             sys.exit(1)
         
 except subprocess.TimeoutExpired:
