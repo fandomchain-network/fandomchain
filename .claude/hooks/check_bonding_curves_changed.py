@@ -44,38 +44,6 @@ CRITICAL_CONSTANTS = {
     'MAX_PRICE_IMPACT_PERCENT': 'int64(10)',
 }
 
-
-def check_constants_modified(file_path):
-    """Check if critical constants have been modified in bonding_curve.go"""
-    modified_constants = []
-    
-    try:
-        with open(file_path, 'r') as f:
-            content = f.read()
-            
-        for const_name, expected_value in CRITICAL_CONSTANTS.items():
-            # Pattern to match: CONST_NAME = value or CONST_NAME = value (with spaces/tabs)
-            pattern = rf'{const_name}\s*=\s*([^\s\n]+)'
-            match = re.search(pattern, content)
-            
-            if match:
-                actual_value = match.group(1).strip()
-                # Normalize spaces in values for comparison
-                expected_normalized = expected_value.replace(' ', '').replace('_', '')
-                actual_normalized = actual_value.replace(' ', '').replace('_', '')
-                
-                if expected_normalized != actual_normalized:
-                    modified_constants.append({
-                        'name': const_name,
-                        'expected': expected_value,
-                        'actual': actual_value
-                    })
-    except Exception as e:
-        print(f"Warning: Could not check constants: {e}", file=sys.stderr)
-    
-    return modified_constants
-
-
 def check_pretool_edit(tool_input):
     """Check if a PreToolUse Edit is trying to modify critical constants"""
     modified_constants = []
