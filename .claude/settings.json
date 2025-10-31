@@ -1,0 +1,53 @@
+{
+  "hooks": {
+    "user-prompt-submit": {
+      "bash": "if git diff --cached --name-only 2>/dev/null | grep -qE '\\.(go|proto)$'; then echo '🔍 Running tests and linting...' && make test-unit && make lint && echo '✓ All checks passed'; fi",
+      "description": "Run tests and linting when Go/Proto files are staged for commit"
+    },
+    "after-edit": [
+      {
+        "bash": "if [[ \"$FILE_PATH\" == *.proto ]]; then echo '🔄 Regenerating proto files...' && make proto-gen && echo '✓ Proto files regenerated'; fi",
+        "description": "Auto-regenerate proto files when .proto files are edited"
+      },
+      {
+        "bash": "if [[ \"$FILE_PATH\" == *bonding_curve.go ]]; then echo '⚠️  Bonding curve modified - verify constants and formulas'; echo '   Constants to check:'; echo '   - INITIAL_VIRTUAL_TOKEN_RESERVES = 1,000,000'; echo '   - INITIAL_VIRTUAL_FANDOM_RESERVES = 30'; echo '   - INITIAL_REAL_TOKEN_RESERVES = 800,000'; fi",
+        "description": "Warn when bonding curve logic is modified"
+      },
+      {
+        "bash": "if [[ \"$FILE_PATH\" == *keeper/*.go ]] || [[ \"$FILE_PATH\" == *types/*.go ]]; then echo '📝 Reminder: Update ARCHITECTURE.md if business logic changed'; fi",
+        "description": "Remind to update architecture documentation"
+      },
+      {
+        "bash": "if [[ \"$FILE_PATH\" == *module_ibc.go ]] || [[ \"$FILE_PATH\" == *ibc.go ]]; then echo '⚠️  IBC module modified'; echo '   Action required:'; echo '   - Verify IBC connections still work'; echo '   - Test with: /ibc-status'; fi",
+        "description": "Warn when IBC-related files are modified"
+      }
+    ],
+    "before-write": {
+      "bash": "if [[ \"$FILE_PATH\" == *.go ]]; then if ! gofmt -l \"$FILE_PATH\" 2>/dev/null | grep -q .; then exit 0; else echo '⚠️  File needs formatting - run: gofmt -w \"$FILE_PATH\"'; exit 1; fi; fi",
+      "description": "Verify Go files are properly formatted before writing"
+    },
+    "before-commit": [
+      {
+        "bash": "if git diff --cached --name-only 2>/dev/null | grep -q genesis.json; then echo '⚠️  Genesis file modified'; echo '   Ensure:'; echo '   - Testnet compatibility'; echo '   - Chain-id consistency'; echo '   - Initial balances are correct'; fi",
+        "description": "Warn when genesis configuration is modified"
+      },
+      {
+        "bash": "echo '🔒 Running security checks...' && make govulncheck && echo '✓ No vulnerabilities detected'",
+        "description": "Check for known Go vulnerabilities before committing"
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(make test-unit:*)",
+      "Bash(make lint:*)",
+      "Bash(make proto-gen:*)",
+      "Bash(make govulncheck:*)",
+      "Bash(gofmt:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
